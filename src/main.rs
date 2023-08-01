@@ -7,13 +7,12 @@ use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
 #[tokio::main]
 async fn main() {
-    let tracing_layer = tracing_subscriber::fmt::layer();
     let tracing_filter = filter::Targets::new()
         .with_target("hyper", Level::INFO)
         .with_default(Level::DEBUG);
     tracing_subscriber::registry()
-        .with(tracing_layer)
         .with(tracing_filter)
+        .with(tracing_logfmt::layer())
         .init();
 
     let app = Router::new()
@@ -22,7 +21,7 @@ async fn main() {
         .route("/r/:url_id", get(redirect_to_target))
         .layer(TraceLayer::new_for_http());
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], 3000));
+    let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::info!("Listening on http://{addr}");
     Server::bind(&addr)
         .serve(app.into_make_service())
