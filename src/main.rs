@@ -1,7 +1,10 @@
 use std::net::SocketAddr;
 
 use axum::{extract::Path, response::Redirect, routing::get, Router, Server};
-use tower_http::trace::TraceLayer;
+use tower_http::{
+    trace::{DefaultOnResponse, TraceLayer},
+    LatencyUnit,
+};
 use tracing::Level;
 use tracing_subscriber::{filter, layer::SubscriberExt, util::SubscriberInitExt};
 
@@ -15,11 +18,17 @@ async fn main() {
         .with(tracing_logfmt::layer())
         .init();
 
+    let trace_layer = TraceLayer::new_for_http().on_response(
+        DefaultOnResponse::new()
+            .level(Level::INFO)
+            .latency_unit(LatencyUnit::Micros),
+    );
+
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/404", get(not_found))
         .route("/r/:url_id", get(redirect_to_target))
-        .layer(TraceLayer::new_for_http());
+        .layer(trace_layer);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
     tracing::info!("Listening on http://{addr}");
