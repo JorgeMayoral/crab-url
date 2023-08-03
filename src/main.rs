@@ -43,6 +43,7 @@ async fn main() {
         .route("/404", get(not_found))
         .route("/r/:url_id", get(redirect_to_target))
         .route("/add", post(add_url))
+        .route("/check", post(check_id))
         .layer(trace_layer)
         .with_state(app_state);
 
@@ -107,6 +108,37 @@ async fn add_url(
     tracing::debug!("Adding url: {url} with id: {id}");
     let _: Result<String, redis::RedisError> = connection.set_ex(&id, url, ttl);
     (StatusCode::OK, id)
+}
+
+#[derive(serde::Deserialize)]
+struct CheckIdBody {
+    id: String,
+}
+
+async fn check_id(
+    State(app_state): State<Arc<AppState>>,
+    Json(body): Json<CheckIdBody>,
+) -> (StatusCode, String) {
+    let connection = app_state.redis_client.get_connection();
+    if let Err(connection) = connection {
+        tracing::error!(
+            "Failed to connect to redis in check id. Error: {}",
+            connection
+        );
+        return (
+            StatusCode::INTERNAL_SERVER_ERROR,
+            "Failed to connect to redis".to_string(),
+        );
+    }
+    let mut connection = connection.unwrap();
+    let id = body.id;
+    let target_url: Result<String, redis::RedisError> = connection.get(&id);
+    if target_url.is_err() {
+        tracing::debug!("Url with id: {} not found", id);
+        return (StatusCode::NOT_FOUND, "Not Found".to_string());
+    }
+    let target_url = target_url.unwrap();
+    (StatusCode::OK, target_url)
 }
 
 async fn not_found() -> &'static str {
