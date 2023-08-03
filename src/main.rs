@@ -1,7 +1,7 @@
 use std::{net::SocketAddr, sync::Arc};
 
 use axum::{
-    extract::{Path, State},
+    extract::{Json, Path, State},
     http::StatusCode,
     response::Redirect,
     routing::{get, post},
@@ -31,7 +31,7 @@ async fn main() {
     let trace_layer = TraceLayer::new_for_http().on_response(
         DefaultOnResponse::new()
             .level(Level::INFO)
-            .latency_unit(LatencyUnit::Micros),
+            .latency_unit(LatencyUnit::Millis),
     );
 
     dotenvy::dotenv().expect("Failed to load .env file"); // TODO: Find a better to do this
@@ -80,7 +80,15 @@ async fn redirect_to_target(
     (StatusCode::SEE_OTHER, Redirect::to(&target_url))
 }
 
-async fn add_url(State(app_state): State<Arc<AppState>>) -> StatusCode {
+#[derive(serde::Deserialize)]
+struct AddUrlBody {
+    url: String,
+}
+
+async fn add_url(
+    State(app_state): State<Arc<AppState>>,
+    Json(body): Json<AddUrlBody>,
+) -> StatusCode {
     let connection = app_state.redis_client.get_connection();
     if let Err(connection) = connection {
         tracing::error!(
@@ -90,8 +98,11 @@ async fn add_url(State(app_state): State<Arc<AppState>>) -> StatusCode {
         return StatusCode::INTERNAL_SERVER_ERROR;
     }
     let mut connection = connection.unwrap();
-    let ttl = 24 * 60 * 60; // 24 hours
-    let _: Result<String, redis::RedisError> = connection.set_ex("test", "https://yorch.dev", ttl);
+    let ttl = 6 * 60 * 60; // 6 hours
+    let id = nanoid::nanoid!(5);
+    let url = body.url;
+    tracing::debug!("Adding url: {url} with id: {id}");
+    let _: Result<String, redis::RedisError> = connection.set_ex(id, url, ttl);
     StatusCode::OK
 }
 

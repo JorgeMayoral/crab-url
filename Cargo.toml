@@ -8,7 +8,9 @@ edition = "2021"
 [dependencies]
 axum = "0.6.19"
 dotenvy = "0.15.7"
+nanoid = "0.4.0"
 redis = { version = "0.23.1", features = ["tls-native-tls"] }
+serde = { version = "1.0.180", features = ["derive"] }
 tokio = { version = "1.29.1", features = ["macros", "rt-multi-thread"] }
 tower-http = { version = "0.4.3", features = [
   "trace",
