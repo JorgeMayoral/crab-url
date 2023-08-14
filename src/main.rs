@@ -6,6 +6,7 @@ use axum::{
 };
 
 mod app;
+mod models;
 mod routes;
 mod telemetry;
 mod url_repository;
@@ -25,9 +26,9 @@ async fn main() {
     let app = Router::new()
         .route("/health", get(health_check))
         .route("/404", get(not_found))
-        .route("/r/:url_id", get(redirect_to_target))
         .route("/add", post(add_url))
         .route("/check", post(check_id))
+        .route("/:url_id", get(redirect_to_target))
         .layer(trace_layer)
         .layer(CorsLayer::permissive()) // FIXME: use better CORS policy
         .with_state(app_state);
