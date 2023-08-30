@@ -15,6 +15,7 @@ pub struct CheckUrlResponse {
     error: Option<String>,
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn check_id(
     State(app_state): State<Arc<AppState>>,
     Json(body): Json<CheckIdBody>,

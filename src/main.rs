@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::{io::IsTerminal, net::SocketAddr, sync::Arc};
 
 use axum::{
     routing::{get, post},
@@ -7,8 +7,10 @@ use axum::{
 
 mod app;
 mod cli;
+mod error;
 mod models;
 mod routes;
+mod trace_layer;
 mod url_repository;
 
 use app::AppState;
@@ -18,10 +20,21 @@ use tower_http::{cors::CorsLayer, trace::TraceLayer};
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
+    color_eyre::config::HookBuilder::default()
+        .theme(if !std::io::stderr().is_terminal() {
+            color_eyre::config::Theme::new()
+        } else {
+            color_eyre::config::Theme::dark()
+        })
+        .install()?;
+
     let cli = cli::Cli::parse();
     cli.instrumentation.setup()?;
 
-    let trace_layer = TraceLayer::new_for_http();
+    let trace_layer = TraceLayer::new_for_http()
+        .make_span_with(trace_layer::trace_layer_make_span_with)
+        .on_request(trace_layer::trace_layer_on_request)
+        .on_response(trace_layer::trace_layer_on_response);
 
     let app_state = AppState::new();
     let app_state = Arc::new(app_state);
@@ -38,7 +51,7 @@ async fn main() -> color_eyre::Result<()> {
     let addr = cli.bind;
     tracing::info!(event = "server_start", "Listening on http://{addr}");
     Server::bind(&addr)
-        .serve(app.into_make_service())
+        .serve(app.into_make_service_with_connect_info::<SocketAddr>())
         .await
         .expect("Failed to start server");
 

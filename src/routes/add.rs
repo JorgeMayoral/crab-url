@@ -15,6 +15,7 @@ pub struct AddUrlResponse {
     error: Option<String>,
 }
 
+#[tracing::instrument(skip_all)]
 pub async fn add_url(
     State(app_state): State<Arc<AppState>>,
     Json(body): Json<AddUrlBody>,

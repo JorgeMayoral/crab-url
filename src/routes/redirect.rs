@@ -9,6 +9,7 @@ use redis::Commands;
 
 use crate::app::AppState;
 
+#[tracing::instrument(skip_all, fields(id = %url_id))]
 pub async fn redirect_to_target(
     Path(url_id): Path<String>,
     State(app_state): State<Arc<AppState>>,
