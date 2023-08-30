@@ -8,7 +8,6 @@ edition = "2021"
 [dependencies]
 axum = "0.6.19"
 clap = { version = "4.4.1", features = ["derive", "env"] }
-dotenvy = "0.15.7"
 nanoid = "0.4.0"
 redis = { version = "0.23.1", features = ["tls-native-tls"] }
 serde = { version = "1.0.180", features = ["derive"] }
@@ -18,7 +17,6 @@ tower-http = { version = "0.4.3", features = [
   "cors",
 ], default-features = false }
 tracing = "0.1.37"
-tracing-logfmt = "0.3.2"
 tracing-subscriber = { version = "0.3.17", features = ["env-filter", "json"] }
 tracing-error = "0.2"
 color-eyre = { version = "0.6", default-features = false, features = [
