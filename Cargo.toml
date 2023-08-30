@@ -1,5 +1,5 @@
 [package]
-name = "url-shortener"
+name = "crab-url"
 version = "0.1.0"
 edition = "2021"
 

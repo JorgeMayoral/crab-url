@@ -32,7 +32,7 @@ pub struct Instrumentation {
     /// Tracing directives
     ///
     /// See https://docs.rs/tracing-subscriber/latest/tracing_subscriber/filter/struct.EnvFilter.html#directives
-    #[clap(long = "log-directive", global = true, env = "DEMO_LOG_DIRECTIVES", value_delimiter = ',', num_args = 0..)]
+    #[clap(long = "log-directive", global = true, env = "LOG_DIRECTIVES", value_delimiter = ',', num_args = 0..)]
     pub log_directives: Vec<Directive>,
 }
 
