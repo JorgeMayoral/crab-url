@@ -1,0 +1,6 @@
+POST http://127.0.0.1:3000/check
+content-type: application/json
+
+{
+    "id": "2sy-7E"
+}
