@@ -34,7 +34,7 @@ async fn main() {
         .with_state(app_state);
 
     let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
-    tracing::info!("Listening on http://{addr}");
+    tracing::info!(event = "server_start", "Listening on http://{addr}");
     Server::bind(&addr)
         .serve(app.into_make_service())
         .await

@@ -22,28 +22,34 @@ pub async fn check_id(
     let id = body.id;
     let url_repo = app_state.get_url_repo();
     let get_url_result = url_repo.get_url(&id);
-    if let Err(get_url_error) = get_url_result {
-        tracing::error!("Failed to get url. Error: {}", get_url_error);
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(CheckUrlResponse {
-                data: None,
-                error: Some("Failed to get url".to_string()),
-            }),
-        );
-    }
+    let url = match get_url_result {
+        Ok(url) => url,
+        Err(get_url_error) => {
+            tracing::error!("Failed to get url. Error: {}", get_url_error);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(CheckUrlResponse {
+                    data: None,
+                    error: Some("Failed to get url".to_string()),
+                }),
+            );
+        }
+    };
     let get_ttl_result = url_repo.get_ttl(&id);
-    if let Err(get_ttl_error) = get_ttl_result {
-        tracing::error!("Failed to get ttl. Error: {}", get_ttl_error);
-        return (
-            StatusCode::INTERNAL_SERVER_ERROR,
-            Json(CheckUrlResponse {
-                data: None,
-                error: Some("Failed to get ttl".to_string()),
-            }),
-        );
-    }
-    let body = UrlRecord::new(id, get_url_result.unwrap(), get_ttl_result.unwrap());
+    let ttl = match get_ttl_result {
+        Ok(ttl) => ttl,
+        Err(get_ttl_error) => {
+            tracing::error!("Failed to get ttl. Error: {}", get_ttl_error);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(CheckUrlResponse {
+                    data: None,
+                    error: Some("Failed to get ttl".to_string()),
+                }),
+            );
+        }
+    };
+    let body = UrlRecord::new(id, url, ttl);
     let response = CheckUrlResponse {
         data: Some(body),
         error: None,
