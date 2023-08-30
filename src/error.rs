@@ -43,16 +43,16 @@ impl IntoResponse for Report {
 
 #[derive(thiserror::Error, Debug)]
 pub enum AppError {
-    #[error("A spooky thing happened")]
-    Spooky,
+    #[error("A database error occurred: {0}")]
+    UrlRepository(String),
 }
 
 impl AppError {
     fn response(&self) -> Response {
         match self {
-            Self::Spooky => (
-                StatusCode::IM_A_TEAPOT,
-                "A user-facing message about a Spooky".to_string(),
+            Self::UrlRepository(_) => (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                "A database error occurred, please try again later".to_string(),
             )
                 .into_response(),
         }

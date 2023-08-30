@@ -26,7 +26,7 @@ pub fn trace_layer_on_request(_request: &Request<Body>, _span: &Span) {
 pub fn trace_layer_on_response(response: &Response<BoxBody>, latency: Duration, span: &Span) {
     span.record(
         "latency",
-        tracing::field::display(format!("{}μs", latency.as_micros())),
+        tracing::field::display(format!("{} ms", latency.as_millis())),
     );
     span.record("status", tracing::field::display(response.status()));
     tracing::info!(event = "request_completed")
