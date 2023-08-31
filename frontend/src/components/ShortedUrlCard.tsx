@@ -32,7 +32,10 @@ export function ShortedUrlCard({ data }: Props) {
 			<Snippet symbol="">{shortedUrl}</Snippet>
 			<Card>
 				<CardHeader>
-					<h3>{data.id}</h3>
+					<h3>
+						Web ID:{' '}
+						<span className="font-bold text-blue-500 text-lg">{data.id}</span>
+					</h3>
 				</CardHeader>
 				<Divider />
 				<CardBody>

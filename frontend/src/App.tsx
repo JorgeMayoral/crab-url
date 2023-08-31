@@ -11,7 +11,10 @@ enum Section {
 function App() {
 	return (
 		<div className="flex flex-col w-full min-h-screen items-center pt-24 px-10 gap-10">
-			<h1 className="text-5xl font-black">🦀 Crab Url 🦀</h1>
+			<header className="text-center">
+				<h1 className="text-5xl font-black">🦀 Crab Url 🦀</h1>
+				<p className="mt-2 text-gray-200">Temporal (3h.) Url Shortener</p>
+			</header>
 			<Tabs>
 				<Tab
 					className="w-full md:max-w-md"
