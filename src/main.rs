@@ -16,7 +16,7 @@ mod url_repository;
 use app::AppState;
 use clap::Parser;
 use routes::{add_url, check_id, health_check, not_found, redirect_to_target};
-use tower_http::{cors::CorsLayer, trace::TraceLayer};
+use tower_http::{cors::CorsLayer, services::ServeDir, trace::TraceLayer};
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
@@ -36,6 +36,8 @@ async fn main() -> color_eyre::Result<()> {
         .on_request(trace_layer::trace_layer_on_request)
         .on_response(trace_layer::trace_layer_on_response);
 
+    let web_service = ServeDir::new("./frontend/dist");
+
     let app_state = AppState::new();
     let app_state = Arc::new(app_state);
     let app = Router::new()
@@ -43,7 +45,8 @@ async fn main() -> color_eyre::Result<()> {
         .route("/404", get(not_found))
         .route("/add", post(add_url))
         .route("/check", post(check_id))
-        .route("/:url_id", get(redirect_to_target))
+        .route("/r/:url_id", get(redirect_to_target))
+        .fallback_service(web_service)
         .layer(trace_layer)
         .layer(CorsLayer::permissive()) // FIXME: use better CORS policy
         .with_state(app_state);
