@@ -9,6 +9,7 @@ import {
 } from '@nextui-org/react';
 import { ShortedUrl } from '../interfaces';
 import { useEffect, useState } from 'react';
+import { DOMAIN } from '../constants';
 
 interface Props {
 	data: ShortedUrl;
@@ -24,7 +25,7 @@ export function ShortedUrlCard({ data }: Props) {
 		return () => clearInterval(timer);
 	}, []);
 
-	const shortedUrl = `https://crab-url.dev/r/${data.id}`;
+	const shortedUrl = `https://${DOMAIN}/r/${data.id}`;
 
 	return (
 		<div className="flex flex-col gap-8 w-full mt-6">

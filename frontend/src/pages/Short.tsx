@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { ShortedUrl } from '../interfaces';
 import { addUrl } from '../services/add_url';
 import { AppSection } from '../components/AppSection';
+import { DOMAIN } from '../constants';
 
 export function Short() {
 	const [url, setUrl] = useState('');
@@ -33,6 +34,8 @@ export function Short() {
 		setLoading(false);
 	};
 
+	const placeholder = `https://${DOMAIN}`;
+
 	return (
 		<AppSection
 			buttonText="Short"
@@ -43,7 +46,7 @@ export function Short() {
 			loading={loading}
 			onChange={handleUrlChange}
 			onClick={handleShort}
-			placeholder="https://crab-url.dev"
+			placeholder={placeholder}
 			shortedUrlData={shortedUrl}
 			title="Short Url"
 			validState={validState}

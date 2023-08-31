@@ -1,6 +1,7 @@
 import { Button, Input } from '@nextui-org/react';
 import { ShortedUrl } from '../interfaces';
 import { ShortedUrlCard } from './ShortedUrlCard';
+import { DOMAIN } from '../constants';
 
 interface Props {
 	title: string;
@@ -38,7 +39,7 @@ export function AppSection({
 			<h1 className="text-xl font-bold">{title}</h1>
 			{sectionType === 'check' && (
 				<p>
-					ID example: https://crab-url.dev/r/
+					ID example: https://{DOMAIN}/r/
 					<span className="underline font-bold text-blue-500">Ys-43j</span>
 				</p>
 			)}
