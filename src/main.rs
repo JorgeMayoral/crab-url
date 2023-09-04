@@ -16,7 +16,7 @@ mod url_repository;
 use app::AppState;
 use clap::Parser;
 use routes::{add_url, check_id, health_check, not_found, redirect_to_target};
-use tower_http::{cors::CorsLayer, services::ServeDir, trace::TraceLayer};
+use tower_http::{services::ServeDir, trace::TraceLayer};
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
@@ -48,7 +48,6 @@ async fn main() -> color_eyre::Result<()> {
         .route("/r/:url_id", get(redirect_to_target))
         .fallback_service(web_service)
         .layer(trace_layer)
-        .layer(CorsLayer::permissive()) // FIXME: use better CORS policy
         .with_state(app_state);
 
     let addr = cli.bind;
