@@ -9,19 +9,26 @@ impl UrlMetricsService {
         let ip = addr.ip();
         let geolocation_service = Service::IpApi;
 
-        if let Ok(geolocation) = Locator::get_ipaddr(ip, geolocation_service).await {
-            let Locator {
-                ip,
-                latitude: _,
-                longitude: _,
-                city: _,
-                region: _,
-                country,
-                timezone: _,
-            } = geolocation;
+        match Locator::get_ipaddr(ip, geolocation_service).await {
+            Ok(geolocation) => {
+                let Locator {
+                    ip,
+                    latitude: _,
+                    longitude: _,
+                    city: _,
+                    region: _,
+                    country,
+                    timezone: _,
+                } = geolocation;
 
-            let timestamp = chrono::Utc::now();
-            tracing::info!("Adding visit for \"{url_id}\" from {ip} in {country} at {timestamp}");
+                let timestamp = chrono::Utc::now();
+                tracing::info!(
+                    "Adding visit for \"{url_id}\" from {ip} in {country} at {timestamp}"
+                );
+            }
+            Err(e) => {
+                tracing::error!("Failed to get geolocation for {ip}: {e}");
+            }
         };
     }
 
