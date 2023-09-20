@@ -4,6 +4,8 @@ mod health;
 mod not_found;
 mod redirect;
 
+pub mod metrics;
+
 pub use add::*;
 pub use check::*;
 pub use health::*;

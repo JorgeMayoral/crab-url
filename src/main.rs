@@ -4,19 +4,23 @@ use axum::{
     routing::{get, post},
     Router, Server,
 };
+use tower_http::{services::ServeDir, trace::TraceLayer};
 
 mod app;
 mod cli;
 mod error;
 mod models;
 mod routes;
+mod services;
 mod trace_layer;
 mod url_repository;
 
 use app::AppState;
 use clap::Parser;
-use routes::{add_url, check_id, health_check, not_found, redirect_to_target};
-use tower_http::{services::ServeDir, trace::TraceLayer};
+use routes::{
+    add_url, check_id, health_check, metrics::generate_metrics_router, not_found,
+    redirect_to_target,
+};
 
 #[tokio::main]
 async fn main() -> color_eyre::Result<()> {
@@ -46,6 +50,7 @@ async fn main() -> color_eyre::Result<()> {
         .route("/add", post(add_url))
         .route("/check", post(check_id))
         .route("/r/:url_id", get(redirect_to_target))
+        .nest_service("/metrics", generate_metrics_router())
         .fallback_service(web_service)
         .layer(trace_layer)
         .with_state(app_state);
