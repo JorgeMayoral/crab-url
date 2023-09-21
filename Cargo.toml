@@ -31,3 +31,6 @@ hyper = "0.14.27"
 tower = "0.4.13"
 chrono = { version = "0.4.31", features = ["serde"] }
 ipgeolocate = "0.3.5"
+libsql-client = "0.31.11"
+anyhow = "1.0.75"
+axum-macros = "0.3.8"
