@@ -1,7 +1,9 @@
 import { Button, Input } from '@nextui-org/react';
-import { ShortedUrl } from '../interfaces';
+import { Metrics, ShortedUrl } from '../interfaces';
 import { ShortedUrlCard } from './ShortedUrlCard';
 import { DOMAIN } from '../constants';
+import { TotalVisitsKpi } from './TotalVisitsKpi';
+import { CountryVisitsTable } from './CountryVisitsTable';
 
 interface Props {
 	title: string;
@@ -17,6 +19,7 @@ interface Props {
 	error: string;
 	validState: 'valid' | 'invalid';
 	sectionType: 'short' | 'check';
+	metrics?: Metrics;
 }
 
 export function AppSection({
@@ -33,6 +36,7 @@ export function AppSection({
 	error,
 	loading,
 	sectionType,
+	metrics,
 }: Props) {
 	return (
 		<section className="flex flex-col gap-4 w-full items-center">
@@ -62,6 +66,12 @@ export function AppSection({
 				{buttonText}
 			</Button>
 			{shortedUrlData && <ShortedUrlCard data={shortedUrlData} />}
+			{metrics && !loading && sectionType === 'check' && (
+				<div className="flex flex-col gap-8 w-full mt-6">
+					<TotalVisitsKpi visits={metrics.totalVisits} />
+					<CountryVisitsTable countries={metrics.countries} />
+				</div>
+			)}
 		</section>
 	);
 }

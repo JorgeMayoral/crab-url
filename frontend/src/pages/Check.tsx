@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { ShortedUrl } from '../interfaces';
+import { Metrics, ShortedUrl } from '../interfaces';
 import { checkId } from '../services/check_id';
 import { AppSection } from '../components/AppSection';
+import { getUrlMetrics } from '../services/get_url_metrics';
 
 export function Check() {
 	const [id, setId] = useState('');
@@ -9,6 +10,7 @@ export function Check() {
 	const [error, setError] = useState('');
 	const [validState, setValidState] = useState<'valid' | 'invalid'>('valid');
 	const [shortedUrl, setShortUrl] = useState<ShortedUrl | null>(null);
+	const [metrics, setMetrics] = useState<Metrics>();
 
 	const handleIdChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setValidState('valid');
@@ -19,14 +21,17 @@ export function Check() {
 	const handleCheck = async () => {
 		if (id.length === 0) return;
 		setLoading(true);
-		const result = await checkId(id);
-		if (result.data) {
+		const checkResult = await checkId(id);
+		if (checkResult.data) {
 			setValidState('valid');
 			setError('');
 			setId('');
-			setShortUrl(result.data);
-		} else if (result.error) {
-			console.error(result.error);
+			setShortUrl(checkResult.data);
+
+			const metrics = await getUrlMetrics(id);
+			setMetrics(metrics);
+		} else if (checkResult.error) {
+			console.error(checkResult.error);
 			setValidState('invalid');
 			setError("Couldn't check the id, try again later");
 		}
@@ -48,6 +53,7 @@ export function Check() {
 			title="Check Url"
 			validState={validState}
 			sectionType="check"
+			metrics={metrics}
 		/>
 	);
 }

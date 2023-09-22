@@ -10,3 +10,10 @@ export interface ApiResponse {
   data?: ShortedUrl
   error?: AppError
 }
+
+export interface Metrics {
+  totalVisits: number;
+  countries: {
+    [key: string]: number;
+  }
+}
